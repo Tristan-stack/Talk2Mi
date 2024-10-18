@@ -2,10 +2,12 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const Pusher = require('pusher');
 const cors = require('cors');
-
+const mongoose = require('mongoose');
 
 const app = express();
 const port = 3000; // ou tout autre port que tu souhaites utiliser
+const mongoDB = 'mongodb://localhost:27017/chat'; 
+const Message = require('./models/Messages');
 
 // Middleware
 app.use(cors());
@@ -21,17 +23,34 @@ const pusher = new Pusher({
     useTLS: true
 });
 
+// Connexion à la base de données
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(()=> console.log('Connexion à la base de données réussie!'))
+    .catch(()=> console.log('Connexion à la base de données échouée!'));
+
 // Route pour envoyer des messages
 app.post('/message', (req, res) => {
     const message = req.body.message;
 
-    // Publier un événement dans le canal
-    pusher.trigger('chat-channel', 'message-event', {
-        message: message
-    });
+    // Créer une nouvelle instance du modèle Message
+    const newMessage = new Message({ message });
 
-    res.send('Message envoyé!');
+    // Enregistrer le message dans la base de données
+    newMessage.save()
+        .then(() => {
+            // Publier un événement dans le canal
+            pusher.trigger('chat-channel', 'message-event', {
+                message: message
+            });
+            res.send('Message enregistré et envoyé !');
+        })
+        .catch(err => {
+            console.error('Erreur lors de l\'enregistrement du message:', err);
+            res.status(500).send('Erreur lors de l\'enregistrement du message.');
+        });
 });
+
+
 
 // Démarrage du serveur
 app.listen(port, () => {
