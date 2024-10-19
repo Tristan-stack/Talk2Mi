@@ -1,18 +1,35 @@
 <template>
-  <div>
-    <h1>Chat</h1>
-    <div v-for="msg in messages" :key="msg._id" id="chat-container">
-      <p>{{ msg.message }} - {{ formatTime(msg.createdAt) }} </p>
+  <div class="flex">
+    <!-- Sidebar -->
+    <Sidebar />
+
+    <!-- Chat Component -->
+    <div class="w-1/2 flex-1 bg-backgroundDark text-textLight p-4 m-2">
+      <h1 class="text-3xl font-bold mb-4 bg-primary-light text-black rounded-lg p-2">Chat</h1>
+
+      <div id="chat-container" class="h-96 overflow-y-scroll p-4 bg-gray-800 rounded-lg shadow-md">
+        <div v-for="msg in messages" :key="msg._id" class="mb-2">
+          <p class="bg-primary-light text-black rounded-lg p-2 max-w-xs">
+            {{ msg.message }} - {{ formatTime(msg.createdAt) }}
+          </p>
+        </div>
+      </div>
+
+      <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Tapez votre message"
+        class="mt-4 w-full p-2 border border-secondary-light rounded-lg bg-gray-700 text-textLight placeholder-gray-400" />
     </div>
-    <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Tapez votre message" />
   </div>
 </template>
 
 <script>
+import Sidebar from './Sidebar.vue'; // Importation du composant Sidebar
 import Pusher from 'pusher-js';
 import axios from 'axios';
 
 export default {
+  components: {
+    Sidebar,
+  },
   data() {
     return {
       messages: [],
@@ -76,8 +93,6 @@ export default {
         .catch((error) => {
           console.error(error);
         });
-
-      console.log(this.newMessage);
     },
 
     showNotification(message) {
@@ -99,5 +114,5 @@ export default {
 </script>
 
 <style scoped>
-/* Ajoute des styles ici si nécessaire */
+/* Styles personnalisés ici si nécessaire */
 </style>
