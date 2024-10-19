@@ -40,7 +40,8 @@ app.post('/message', (req, res) => {
         .then(() => {
             // Publier un événement dans le canal
             pusher.trigger('chat-channel', 'message-event', {
-                message: message
+                message: message,
+                createdAt: newMessage.createdAt
             });
             res.send('Message enregistré et envoyé !');
         })
@@ -50,7 +51,17 @@ app.post('/message', (req, res) => {
         });
 });
 
-
+// Route pour récupérer les messages
+app.get('/messages', (req, res) => {
+    Message.find()
+        .then(messages => {
+            res.json(messages);
+        })
+        .catch(err => {
+            console.error('Erreur lors de la récupération des messages:', err);
+            res.status(500).send('Erreur lors de la récupération des messages.');
+        });
+});
 
 // Démarrage du serveur
 app.listen(port, () => {
