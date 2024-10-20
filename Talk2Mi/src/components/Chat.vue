@@ -1,39 +1,42 @@
 <template>
   <div class="flex">
     <!-- Sidebar -->
-    <Sidebar />
+    <!--<Sidebar />-->
 
     <!-- Chat Component -->
-    <div class="w-1/2 flex-1 bg-backgroundDark text-textLight p-4 m-2">
-      <h1 class="text-3xl font-bold mb-4 bg-primary-light text-black rounded-lg p-2">Chat</h1>
+    <div class="bg-transparent backdrop-blur-sm border border-gray-500/10 w-1/2 h-2/3 overflow-hidden shadow-2xl shadow-gray-500/30 rounded-lg ">
+      <h1 class="bg-gradient-to-r from-[#57ebdf8c] to-[#aefb2a85] p-4 border-b border-gray-200 backdrop-blur-sm shadow-xl shadow-gray-300/50 mb-4">Chat avec : {{ url }}</h1>
 
-      <div id="chat-container" class="h-96 overflow-y-scroll p-4 bg-gray-800 rounded-lg shadow-md">
-        <div v-for="msg in messages" :key="msg._id" class="mb-2">
-          <p class="bg-primary-light text-black rounded-lg p-2 max-w-xs">
-            {{ msg.message }} - {{ formatTime(msg.createdAt) }}
+      <div id="chat-container" class="p-3 py-7">
+        <div v-for="msg in messages" :key="msg._id" class="w-1/3 mb-2 rounded-md bg-[#7ef29d] ">
+          <p class=" ml-2 py-3">
+            {{ msg.message }} 
+            <!--- {{ formatTime(msg.createdAt) }} --> 
           </p>
         </div>
       </div>
 
-      <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Tapez votre message"
-        class="mt-4 w-full p-2 border border-secondary-light rounded-lg bg-gray-700 text-textLight placeholder-gray-400" />
+      <input v-model="newMessage" @keyup.enter="sendMessage" placeholder="Tapez votre message" class="w-1/3 ml-3 p-2 bg-white/60 backdrop-blur-sm border border-gray-500/10 rounded-md" />
     </div>
   </div>
 </template>
 
 <script>
-import Sidebar from './Sidebar.vue'; // Importation du composant Sidebar
+
+// import Sidebar from './Sidebar.vue'; // Importation du composant Sidebar
 import Pusher from 'pusher-js';
 import axios from 'axios';
 
 export default {
   components: {
-    Sidebar,
+    // Sidebar,
   },
+
   data() {
     return {
       messages: [],
       newMessage: '',
+      url: '',
     };
   },
 
@@ -41,6 +44,8 @@ export default {
     if (Notification.permission !== 'granted') {
       Notification.requestPermission();
     }
+
+    this.url = window.location.href;
 
     // Configurer Pusher
     const pusher = new Pusher('367eb15097d9efb2b6d7', {
